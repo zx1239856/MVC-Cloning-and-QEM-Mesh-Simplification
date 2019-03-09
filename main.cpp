@@ -25,6 +25,8 @@ namespace mask {
     cv::Mat orig_dst_img;
     cv::Mat dst_img;
 
+    short mode = 0;
+
     void onMouse(int evt, int x, int y, int flags, void *param) {
         if (evt == CV_EVENT_LBUTTONUP || !(flags & CV_EVENT_FLAG_LBUTTON))
             prev_point = cv::Point(-1, -1);
@@ -42,11 +44,33 @@ namespace mask {
     }
 
     void onMouseSelDest(int evt, int x, int y, int flags, void *param) {
-        if (evt == CV_EVENT_LBUTTONDOWN) {
+        if (evt == CV_EVENT_LBUTTONDOWN || evt == CV_EVENT_RBUTTONDOWN) {
+            if(evt == CV_EVENT_RBUTTONDOWN)
+            {
+                ++mode;
+                mode %= 4;
+            }
             dst_img = orig_dst_img.clone();
-            sel_point = cv::Point(x, y);
-            cv::drawMarker(dst_img, sel_point, cv::Scalar(0, 20, 255));
-            cv::rectangle(dst_img, sel_point, cv::Point(x + orig_img.cols, y + orig_img.rows), cv::Scalar(0, 100, 255));
+            cv::drawMarker(dst_img, cv::Point(x, y), cv::Scalar(0, 20, 255));
+            switch(mode)
+            {
+                case 0:
+                    sel_point = cv::Point(x,y);
+                    cv::rectangle(dst_img, sel_point, cv::Point(x + orig_img.cols, y + orig_img.rows), cv::Scalar(0, 100, 255));
+                    break;
+                case 1:
+                    sel_point = cv::Point(x - orig_img.cols, y);
+                    cv::rectangle(dst_img, sel_point, cv::Point(x , y + orig_img.rows), cv::Scalar(0, 100, 255));
+                    break;
+                case 2:
+                    sel_point = cv::Point(x - orig_img.cols, y - orig_img.rows);
+                    cv::rectangle(dst_img, sel_point, cv::Point(x, y), cv::Scalar(0, 100, 255));
+                    break;
+                case 3:
+                    sel_point = cv::Point(x, y - orig_img.rows);
+                    cv::rectangle(dst_img, sel_point, cv::Point(x + orig_img.cols, y), cv::Scalar(0, 100, 255));
+                    break;
+            }
             cv::imshow(target_pos_sel_window, dst_img);
         }
     }
