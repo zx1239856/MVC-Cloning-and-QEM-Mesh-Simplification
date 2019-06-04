@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <chrono>
 #include <unordered_map>
 #include <unordered_set>
 #include <set>
@@ -444,7 +445,9 @@ public:
                     ++pp;
                     auto pos1 = seg.find('/');
                     auto pos2 = seg.find('/', pos1 + 1);
-                    string v = seg.substr(0, pos1), vt = seg.substr(pos1 + 1, pos2 - pos1 - 1), vn = seg.substr(
+                    string v = seg.substr(0, pos1), vt = (pos1 >= seg.length()) ? ""
+                                                                                : seg.substr(
+                                    pos1 + 1, pos2 - pos1 - 1), vn = (pos2 >= seg.length()) ? "" : seg.substr(
                             pos2 + 1);
                     if (!v.length()) {
                         LOG(FATAL) << "Invalid OBJ File. Faces should contain vertex info at least!";
@@ -554,14 +557,19 @@ public:
     }
 
     void simplify(std::string out_file, float ratio) {
+        using namespace std::chrono;
         flip_num = degenerate_num = 0;
         CHECK(ratio > 0 && ratio <= 1) << "Invalid simplification ratio detected. Should in range (0, 1]";
         int target_num_vert = static_cast<int>(ratio * vertices.size());
+        auto start = high_resolution_clock::now();
         while (vertices.size() > target_num_vert) {
             auto pp = pp_heap.getTop();
             mergePointPair(pp);
         }
-        LOG(INFO) << "Simplification finished with " << vertices.size() << " vertices left.";
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<milliseconds>(stop - start);
+        LOG(INFO) << "Simplification finished with " << vertices.size() << " vertices left. Time consumption: "
+                  << duration.count() << " ms";
         LOG(INFO) << "During this process, " << flip_num << " face flips were prevented, " << degenerate_num
                   << " points were degenerated.";
         LOG(INFO) << "Saving to file " << out_file;

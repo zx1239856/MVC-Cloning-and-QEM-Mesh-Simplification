@@ -17,6 +17,7 @@ MVCCloner::MVCCloner(mesh::AdaptiveMesh &mesh, cv::Mat &src, cv::Mat &dst) :
 
 // clone src to dst with position (delta_x, delta_y)
 void MVCCloner::startClone(int delta_x, int delta_y) {
+    _output = _dst.clone();
     std::vector<mesh::Point> mesh_pnt = _mesh.getPoints();
     std::vector<mesh::Triangle > mesh_triangle = _mesh.getTriangles();
     std::map<mesh::Point, int> pnt_id = _mesh.getPointId();
