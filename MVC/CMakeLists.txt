@@ -4,7 +4,7 @@ project(MVC)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE release)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -mavx2 -msse4")
 
 find_package(OpenCV REQUIRED)
 find_package(glog REQUIRED)
